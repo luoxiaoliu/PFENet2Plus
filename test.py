@@ -212,8 +212,7 @@ def validate(val_loader, model, criterion):
             ori_label = ori_label.cuda(non_blocking=True)
           
             start_time = time.time()
-            output1 = model(s_x=s_input, s_y=s_mask, x=input, y=target)  # [1, 2, 473, 473]
-            # print(output1.shape)#[1, 2, 473, 473]
+            output = model(s_x=s_input, s_y=s_mask, x=input, y=target)  # [1, 2, 473, 473]
             total_time = total_time + 1
             model_time.update(time.time() - start_time)
 
@@ -223,7 +222,7 @@ def validate(val_loader, model, criterion):
                 backmask[0, :ori_label.size(1), :ori_label.size(2)] = ori_label
                 target = backmask.clone().long()
 
-            output = F.interpolate(output1, size=target.size()[1:], mode='bilinear', align_corners=True)
+            output = F.interpolate(output, size=target.size()[1:], mode='bilinear', align_corners=True)
             
             loss = criterion(output, target)
 

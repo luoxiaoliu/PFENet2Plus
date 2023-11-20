@@ -188,31 +188,6 @@ def main_worker(gpu, ngpus_per_node, argss):
     print(args)
 
     model = torch.nn.DataParallel(model.cuda())
-    # if args.weight:
-    #      if os.path.isfile(args.weight):
-    #          logger.info("=> loading weight '{}'".format(args.weight))
-    #          checkpoint = torch.load(args.weight)
-    #          try:
-    #              model.load_state_dict(checkpoint['state_dict'])
-    #          except RuntimeError:
-    #              print("KeyError")
-    #              model_dict = model.state_dict()
-    #              new_model_dict = OrderedDict()
-    #              for k_model, k_pretrained in zip(list(model_dict.keys()),
-    #                                               list(checkpoint['state_dict'].keys())[
-    #                                               :len(model_dict.keys())]):  # 增加了list
-    #                  if model_dict[k_model].size() == checkpoint['state_dict'][k_pretrained].size():
-    #                      print("%s\t<--->\t%s" % (k_model, k_pretrained))
-    #                      new_model_dict[k_model] = checkpoint['state_dict'][k_pretrained]
-    #                  else:
-    #                      print('Fail to load %s' % (k_model))
-    #
-    #              model_dict.update(new_model_dict)
-    #              model.load_state_dict(model_dict)
-    #
-    #          except KeyError:
-    #              print("Loading pre-trained values failed.")
-    #              raise
 
     if args.weight:
         if os.path.isfile(args.weight):
