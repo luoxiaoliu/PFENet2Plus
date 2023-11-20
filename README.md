@@ -79,7 +79,7 @@ Other projects in few-shot segmentation:
 + On the Texture Bias for FS Seg: https://github.com/rezazad68/fewshot-segmentation
 + SG-One: https://github.com/xiaomengyc/SG-One
 + FS Seg Propogation with Guided Networks: https://github.com/shelhamer/revolver
-+PFENet: https://github.com/dvlab-research/PFENet
++ PFENet: https://github.com/dvlab-research/PFENet
 
 
 Many thanks to their greak work!
