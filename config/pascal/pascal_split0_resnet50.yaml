@@ -1,0 +1,101 @@
+DATA:
+  data_root: ./VOCdevkit2012/VOC2012
+  train_list: ./lists/pascal/voc_sbd_merge_noduplicate.txt
+  val_list: ./lists/pascal/val_fixed.txt
+  classes: 2
+
+
+TRAIN:
+  layers: 50
+  sync_bn: False
+  train_h: 473
+  train_w: 473
+  val_size: 473
+  scale_min: 0.9  # minimum random scale
+  scale_max: 1.1 # maximum random scale
+  rotate_min: -10  # minimum random rotate
+  rotate_max: 10  # maximum random rotate
+  zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+  ignore_label: 255
+  padding_label: 255
+  aux_weight: 1.0
+  train_gpu: [ 0 ]  #[2,3] #[0,1]
+  workers: 8  # data loader workers
+  batch_size: 4  # batch size for training
+  batch_size_val: 1
+  base_lr: 0.0025 #0.00125 #0.0025
+  epochs: 200
+  start_epoch: 0
+  power: 0.9 # 0 means no decay
+  momentum: 0.9
+  weight_decay: 0.0001
+  manual_seed: 321
+  print_freq: 5
+  save_freq: 20
+  save_path: exp/pascal/split0_resnet50/model
+  weight:
+  resume:  #path to l/atest checkpoint
+  evaluate: True
+  split: 0
+  shot: 1
+  vgg: False
+  ppm_scales: [60,30,15,8] #
+  fix_random_seed_val: True
+  warmup: False
+  fix_bn: True
+  use_coco: False
+  use_split_coco: True
+  resized_val: True
+  ori_resize: True  # use original label for evaluation
+  #  multi_scales: [ 1,5,9 ]
+  #  paddings: [ 0,2,4 ]
+  mid_multi_scales: [ 1,3,5 ]
+  mid_paddings: [ 0,1,2 ]
+  multi_scales: [ 1,3,5 ]
+  paddings: [ 0,1,2 ]
+  #  mid_multi_scales: [ 1,3,5 ]
+  #  mid_paddings: [ 0,1,2 ]
+
+  spatial_nsm: False
+  nsm_residue: False
+  use_pre_sa: False
+
+  spatial_encode: False
+
+  multi_nsm: False
+
+  use_multi_supp: False
+  supp_mask_layers: 4
+  supp_mask_acg: gelu
+  supp_mask_num: 4
+
+  supp_bn: False
+
+  real_multi_supp: False
+  multi_supp_residue: False
+
+  use_mid_nsm: True
+  query_down_size: 1
+  down_size: 2
+  strided_theta: False
+  concat_mid: False
+
+  msnsm_type: mean
+  msnsm_bins: [ ]
+  multi_ch: [ ]
+  mchnsm_dropout: 0.15
+  mchnsm_pre_dropout: True
+
+## deprecated multi-processing training
+Distributed:
+  dist_url: tcp://127.0.0.1:6789
+  dist_backend: 'nccl'
+  multiprocessing_distributed: False
+  world_size: 1
+  rank: 0
+  use_apex: False
+  opt_level: 'O0'
+  keep_batchnorm_fp32:
+  loss_scale:
+
+
