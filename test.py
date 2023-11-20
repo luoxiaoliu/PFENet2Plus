@@ -17,7 +17,7 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 from tensorboardX import SummaryWriter
 
-from model.PFENetPlus import PFENet
+from model.PFENet2Plus import PFENet2Plus
 from util import dataset
 from util import transform, config
 from util.util import AverageMeter, poly_learning_rate, intersectionAndUnionGPU
@@ -29,7 +29,7 @@ cv2.setNumThreads(0)
 def get_parser():
     parser = argparse.ArgumentParser(description='PyTorch Semantic Segmentation')
     parser.add_argument('--config', type=str,
-                        default='/home/deep2/xiaoliu/PFENet++/config/pascal/pascal_split0_resnet50.yaml',
+                        default='./pascal_split0_resnet50.yaml',
                         help='config file')
     parser.add_argument('opts', help='see config/ade20k/ade20k_pspnet50.yaml for all options', default=None,
                         nargs=argparse.REMAINDER)
@@ -98,7 +98,7 @@ def main_worker(gpu, ngpus_per_node, argss):
 
     criterion = nn.CrossEntropyLoss(ignore_index=args.ignore_label)
 
-    model = PFENet(layers=args.layers, classes=2, zoom_factor=8, \
+    model = PFENet2Plus(layers=args.layers, classes=2, zoom_factor=8, \
                    criterion=nn.CrossEntropyLoss(ignore_index=255), BatchNorm=BatchNorm, \
                    pretrained=True, shot=args.shot, ppm_scales=args.ppm_scales, vgg=args.vgg,args=argss)
 
@@ -148,62 +148,6 @@ def main_worker(gpu, ngpus_per_node, argss):
 
     loss_val, mIoU_val, mAcc_val, allAcc_val, class_miou = validate(val_loader, model, criterion)
 
-
-##########################################################
-def get_org_img(img):
-    # print('img', img.shape)#3, 473, 473
-    img = np.transpose(img, (1, 2, 0))
-    mean_vals = [0.485, 0.456, 0.406]
-    std_vals = [0.229, 0.224, 0.225]
-    img = img * std_vals + mean_vals
-    img = img * 255
-    # print('img', img.shape)
-    return img
-
-
-label_colours = [(0, 0, 0)
-                 # 0=background
-    , (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128), (128, 0, 128)
-                 # 1=aeroplane, 2=bicycle, 3=bird, 4=boat, 5=bottle
-    , (0, 128, 128), (128, 128, 128), (64, 0, 0), (192, 0, 0), (64, 128, 0)
-                 # 6=bus, 7=car, 8=cat, 9=chair, 10=cow
-    , (192, 128, 0), (64, 0, 128), (192, 0, 128), (64, 128, 128), (192, 128, 128)
-                 # 11=diningtable, 12=dog, 13=horse, 14=motorbike, 15=person
-    , (0, 64, 0), (128, 64, 0), (0, 192, 0), (128, 192, 0), (0, 64, 128)]
-# 16=potted plant, 17=sheep, 18=sofa, 19=train, 20=tv/monitor
-from PIL import Image
-
-
-def decode_labels(mask, num):
-    """Decode batch of segmentation masks.
-
-    Args:
-      label_batch: result of inference after taking argmax.
-
-    Returns:
-      An batch of RGB images of the same size
-    """
-    img = Image.new('RGB', (len(mask[0]), len(mask)))
-    pixels = img.load()
-    for j_, j in enumerate(mask):
-        for k_, k in enumerate(j):
-            if k < 21:
-                # print(k)
-                # print(label_colours[k])
-                pixels[k_, j_] = label_colours[k * num]
-            if k == 255:
-                pixels[k_, j_] = (255, 255, 255)
-    return np.array(img)  # (333, 500, 3)
-
-
-def mask_to_img(mask, img, num):  # mask(333, 500)img(333, 500, 3)
-    # print(mask.shape)
-    # print(img.shape)
-    mask_decoded = decode_labels(mask, num)  # 将mask转化成彩色图像
-
-    # heat_map = cv2.applyColorMap(atten_norm.astype(np.uint8), cv2.COLORMAP_JET)
-    img = cv2.addWeighted(img.astype(np.uint8), 0.8, mask_decoded.astype(np.uint8), 0.9, 0)  # 将原图和mask加权融合
-    return img
 
 
 ###################################################
@@ -260,55 +204,13 @@ def validate(val_loader, model, criterion):
             if (iter_num - 1) * args.batch_size_val >= test_num:
                 break
             iter_num += 1
-            # print(input.shape)#[1, 3, 473, 473]
-            # print(s_input.shape)#[1, 1, 3, 473, 473]
-            # print(target.shape)#[1, 473, 473]
-            # print(s_mask.shape)#[1, 1, 473, 473]
-            # if iter_num==86 or iter_num==129 or iter_num==175 or iter_num==194 or iter_num==196 or iter_num==205\
-            #         or iter_num==295 or iter_num==366 or iter_num==376:
-            #     print(s_path)
-            #     print(q_path)
-            # if iter_num==366:
-            #    pred1 = torch.where(s_mask == 1, torch.full_like(s_mask, 255), torch.full_like(s_mask, 0))
-            #    pred1 = pred1.squeeze().data.cpu().numpy().astype(np.int32)
-            #
-            #    cv2.imwrite('pred_%d.png' % (iter_num), pred1)
+            
             data_time.update(time.time() - end)
             input = input.cuda(non_blocking=True)
-            # print(input.shape)#[1, 3, 473, 473]
             target = target.cuda(non_blocking=True)
-            # print(target.shape)#[1,473, 473]
             target_orign = target.cuda(non_blocking=True)
-            # print(target_orign.shape)#[1,473, 473]
             ori_label = ori_label.cuda(non_blocking=True)
-            # print(ori_label.shape)#[1, 366, 500]
-            #######################
-            # image_q = cv2.imread('/home/prlab/willow/Oneshot/PFENet-master/images/2008_000919.jpg', cv2.IMREAD_COLOR)
-            # image_q = cv2.cvtColor(image_q, cv2.COLOR_BGR2RGB)
-            # image_q = np.float32(image_q)
-            # label_q = cv2.imread('/home/prlab/willow/Oneshot/PFENet-master/images/2008_000919.png',
-            #                      cv2.IMREAD_GRAYSCALE)
-            # image_s = cv2.imread('/home/prlab/willow/Oneshot/PFENet-master/images/2011_002189.jpg', cv2.IMREAD_COLOR)
-            # image_s = cv2.cvtColor(image_s, cv2.COLOR_BGR2RGB)
-            # image_s = np.float32(image_s)
-            # label_s = cv2.imread('/home/prlab/willow/Oneshot/PFENet-master/images/2011_002189.png',
-            #                      cv2.IMREAD_GRAYSCALE)
-            # image_q, label_q = val_transform(image_q, label_q)
-            # image_s, label_s = val_transform(image_s, label_s)
-            #
-            # ###########################
-            # input = image_q.unsqueeze(0).cuda(non_blocking=True)
-            # target = label_q.unsqueeze(0).cuda(non_blocking=True)
-            # target_orign = target.cuda(non_blocking=True)
-            # ori_label = ori_label.cuda(non_blocking=True)
-            # s_input = image_s.unsqueeze(0).unsqueeze(1).cuda(non_blocking=True)
-            # s_mask = label_s.unsqueeze(0).unsqueeze(1).cuda(non_blocking=True)
-            # target = torch.where(target == 1, torch.full_like(target, 1), torch.full_like(target, 0))
-            # print(input.shape)
-            # print(target.shape)
-            # print(s_input.shape)
-            # print(s_mask.shape)
-            ################################################
+          
             start_time = time.time()
             output1 = model(s_x=s_input, s_y=s_mask, x=input, y=target)  # [1, 2, 473, 473]
             # print(output1.shape)#[1, 2, 473, 473]
@@ -322,8 +224,7 @@ def validate(val_loader, model, criterion):
                 target = backmask.clone().long()
 
             output = F.interpolate(output1, size=target.size()[1:], mode='bilinear', align_corners=True)
-            # print(output.shape)
-            # print(target.shape)
+            
             loss = criterion(output, target)
 
             n = input.size(0)
@@ -355,11 +256,8 @@ def validate(val_loader, model, criterion):
                                                               accuracy=accuracy))
 
     iou_class = intersection_meter.sum / (union_meter.sum + 1e-10)
-    # print(iou_class)
-    # print(intersection_meter.sum)
-    # print(union_meter.sum)
+    
     accuracy_class = intersection_meter.sum / (target_meter.sum + 1e-10)
-    # print(target_meter.sum)
     mIoU = np.mean(iou_class)
     mAcc = np.mean(accuracy_class)
     allAcc = sum(intersection_meter.sum) / (sum(target_meter.sum) + 1e-10)

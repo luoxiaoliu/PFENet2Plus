@@ -17,7 +17,7 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 from tensorboardX import SummaryWriter
 
-from model.PFENetPlus import PFENet
+from model.PFENet2Plus import PFENet2Plus
 from util import dataset
 from util import transform, config
 from util.util import AverageMeter, poly_learning_rate, intersectionAndUnionGPU
@@ -36,7 +36,7 @@ def get_model_para_number(model):
 def get_parser():
     parser = argparse.ArgumentParser(description='PyTorch Semantic Segmentation')
     parser.add_argument('--config', type=str,
-                        default='/home/deep2/xiaoliu/PFENet_final/config/pascal/pascal_split3_resnet50.yaml',
+                        default='./config/pascal/pascal_split3_resnet50.yaml',
                         help='config file')
     parser.add_argument('opts', help='see config/ade20k/ade20k_pspnet50.yaml for all options', default=None,
                         nargs=argparse.REMAINDER)
@@ -110,7 +110,7 @@ def main_worker(gpu, ngpus_per_node, argss):
 
     criterion = nn.CrossEntropyLoss(ignore_index=args.ignore_label)
 
-    model = PFENet(layers=args.layers, classes=2, zoom_factor=8,
+    model = PFENet2Plus(layers=args.layers, classes=2, zoom_factor=8,
                    criterion=nn.CrossEntropyLoss(ignore_index=255), BatchNorm=BatchNorm,
                    pretrained=True, shot=args.shot, ppm_scales=args.ppm_scales, vgg=args.vgg, args=args)
 
@@ -280,7 +280,7 @@ def main_worker(gpu, ngpus_per_node, argss):
                                                drop_last=True)
 
     max_iou = 0.
-    filename = 'PFENet.pth'
+    filename = 'PFENet2Plus.pth'
     for epoch in range(args.start_epoch, args.epochs):
         if args.fix_random_seed_val:
             torch.cuda.manual_seed(args.manual_seed + epoch)
