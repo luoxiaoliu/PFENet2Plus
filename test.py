@@ -181,7 +181,7 @@ def validate(val_loader, model, criterion):
         if args.use_coco:
             test_num = 20000
         else:
-            test_num = 1000
+            test_num = 5000
     else:
         test_num = len(val_loader)
     assert test_num % args.batch_size_val == 0
