@@ -23,7 +23,7 @@ TRAIN:
   workers: 16  # data loader workers
   batch_size: 32  # batch size for training
   batch_size_val: 1
-  base_lr: 0.012 #0.00125 #0.0025
+  base_lr: 0.012 #
   epochs: 60
   start_epoch: 0
   power: 0.9 # 0 means no decay

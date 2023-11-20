@@ -34,7 +34,7 @@ TRAIN:
   save_freq: 20
   save_path: exp/coco/split0_resnet101/model
   weight:
-  resume:  #path to l/atest checkpoint
+  resume:  #path to latest checkpoint
   evaluate: True
   split: 0
   shot: 1
