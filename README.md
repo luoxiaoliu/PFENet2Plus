@@ -5,7 +5,7 @@ This is the implementation of our paper [**PFENet++: Boosting Few-Shot Semantic 
 # Get Started
 
 ### Environment
-+ torch==1.7.0 
++ torch==1.7.1 
 + numpy==1.20.3
 + tensorboardX==2.2
 + opencv-python==4.5.2.52
