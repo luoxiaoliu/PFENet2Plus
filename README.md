@@ -5,10 +5,10 @@ This is the implementation of our paper [**PFENet++: Boosting Few-Shot Semantic 
 # Get Started
 
 ### Environment
-+ torch==1.4.0 (torch version >= 1.0.1.post2 should be okay to run this repo)
-+ numpy==1.18.4
-+ tensorboardX==1.8
-+ cv2==4.2.0
++ torch==1.7.0 
++ numpy==1.20.3
++ tensorboardX==2.2
++ opencv-python==4.5.2.52
 
 
 ### Datasets and Data Preparation
