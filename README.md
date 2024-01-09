@@ -92,10 +92,10 @@ If you find this project useful, please consider citing:
   author={Luo, Xiaoliu and Tian, Zhuotao and Zhang, Taiping and Yu, Bei and Tang, Yuan Yan and Jia, Jiaya},
   journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
   title={PFENet++: Boosting Few-Shot Semantic Segmentation With the Noise-Filtered Context-Aware Prior Mask}, 
-  year={2023},
-  volume={},
-  number={},
-  pages={1-16},
+  year={2024},
+  volume={46},
+  number={2},
+  pages={1273-1289},
   doi={10.1109/TPAMI.2023.3329725}}
   
 @article{tian2020pfenet,
